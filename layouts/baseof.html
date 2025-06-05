@@ -49,7 +49,68 @@
         {{ if .Store.Get "hasMermaid" }}
           <script type="module">
             import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
-            mermaid.initialize({ startOnLoad: true });
+            
+            // Get theme preference
+            const getTheme = () => {
+              const theme = document.body.getAttribute('theme');
+              return theme === 'dark' ? 'dark' : 'neutral';
+            };
+            
+            // Initialize mermaid with theme support
+            const initMermaid = () => {
+              mermaid.initialize({ 
+                startOnLoad: true,
+                theme: getTheme(),
+                securityLevel: 'loose',
+                fontFamily: 'inherit'
+              });
+            };
+            
+            // Reinitialize on theme changes
+            const reinitMermaid = () => {
+              const mermaidElements = document.querySelectorAll('.mermaid');
+              if (mermaidElements.length > 0) {
+                mermaid.initialize({
+                  startOnLoad: false,
+                  theme: getTheme(),
+                  securityLevel: 'loose',
+                  fontFamily: 'inherit'
+                });
+                
+                mermaidElements.forEach(async (element, index) => {
+                  const content = element.getAttribute('data-mermaid-content') 
+                    ? atob(element.getAttribute('data-mermaid-content'))
+                    : element.textContent;
+                  
+                  if (content.trim()) {
+                    try {
+                      const { svg } = await mermaid.render(`mermaid-svg-${element.id}-${Date.now()}`, content);
+                      element.innerHTML = svg;
+                    } catch (error) {
+                      console.error('Mermaid rendering error:', error);
+                      element.innerHTML = `<pre class="mermaid-error">${content}</pre>`;
+                    }
+                  }
+                });
+              }
+            };
+            
+            // Initialize on load
+            initMermaid();
+            
+            // Listen for theme changes
+            const themeObserver = new MutationObserver((mutations) => {
+              mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'theme') {
+                  setTimeout(reinitMermaid, 100); // Small delay to ensure theme is applied
+                }
+              });
+            });
+            
+            themeObserver.observe(document.body, {
+              attributes: true,
+              attributeFilter: ['theme']
+            });
           </script>
         {{ end }}
     </body>
