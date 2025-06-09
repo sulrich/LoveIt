@@ -1,1 +1,15 @@
-{{- dict "Content" (trim .Inner "\n") "Page" .Page | partial "plugin/mermaid.html" -}}
+{{- $content := trim .Inner "\n" -}}
+{{- $id := printf "mermaid-%d" (add 1 (len (.Page.Scratch.Get "mermaidCounter" | default slice))) -}}
+{{- .Page.Scratch.Add "mermaidCounter" $id -}}
+
+{{- /* Hugo 0.146+ Store approach for conditional loading */ -}}
+{{- .Page.Store.Set "hasMermaid" true -}}
+
+{{- /* Generate mermaid diagram with enhanced options */ -}}
+<div class="mermaid" id="{{ $id }}" data-mermaid-content="{{ $content | base64Encode }}">
+{{- $content | safeHTML -}}
+</div>
+
+{{- /* Backward compatibility with Scratch-based approach */ -}}
+{{- .Page.Scratch.SetInMap "this" "mermaid" true -}}
+{{- .Page.Scratch.SetInMap "mermaidData" $id $content -}}

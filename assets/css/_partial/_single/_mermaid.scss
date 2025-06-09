@@ -1,0 +1,96 @@
+/* Mermaid diagram styles */
+.mermaid {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  
+  /* Ensure proper background in both themes */
+  background: transparent;
+  
+  /* Handle SVG responsiveness */
+  svg {
+    max-width: 100%;
+    height: auto;
+    
+    /* Improve text readability */
+    text {
+      font-family: inherit;
+    }
+  }
+  
+  /* Error state styling */
+  &-error {
+    background: rgba(var(--color-danger), 0.1);
+    border: 1px solid rgba(var(--color-danger), 0.3);
+    border-radius: 0.25rem;
+    padding: 1rem;
+    color: rgba(var(--color-danger), 1);
+    font-family: var(--code-font-family);
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    text-align: left;
+  }
+  
+  /* Loading state */
+  &:not(:has(svg)):not(.mermaid-error)::before {
+    content: "Loading diagram...";
+    display: block;
+    padding: 2rem;
+    text-align: center;
+    color: var(--global-font-secondary-color);
+    font-style: italic;
+  }
+}
+
+/* Dark theme specific adjustments */
+[theme="dark"] .mermaid {
+  svg {
+    /* Ensure good contrast in dark mode */
+    filter: none;
+    
+    /* Fix any white backgrounds in mermaid elements */
+    .node rect,
+    .node polygon,
+    .node circle,
+    .node ellipse {
+      fill: var(--background-color) !important;
+    }
+    
+    /* Ensure text is visible */
+    text {
+      fill: var(--global-font-color) !important;
+    }
+    
+    /* Fix lines and arrows */
+    .edgePath path,
+    .arrowheadPath {
+      stroke: var(--global-font-color) !important;
+    }
+  }
+}
+
+/* Light theme specific adjustments */
+[theme="light"] .mermaid {
+  svg {
+    /* Ensure proper contrast in light mode */
+    .node rect,
+    .node polygon, 
+    .node circle,
+    .node ellipse {
+      fill: var(--background-color) !important;
+    }
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 680px) {
+  .mermaid {
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    
+    svg {
+      font-size: 12px;
+    }
+  }
+}
